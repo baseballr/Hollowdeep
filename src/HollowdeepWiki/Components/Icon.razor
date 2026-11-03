@@ -1,0 +1,17 @@
+@if (!string.IsNullOrEmpty(Src))
+{
+    <img class="mc-icon @(Src.Contains("/mobs/") ? "render" : "")" src="@Src" alt="@Name" title="@Name" width="@Size" height="@Size" loading="lazy" />
+}
+else
+{
+    <span class="mc-icon placeholder" title="@Name" style="width:@(Size)px;height:@(Size)px;font-size:@(Size * 0.38)px">@Initials</span>
+}
+
+@code {
+    [Parameter] public string? Src { get; set; }
+    [Parameter] public string Name { get; set; } = "";
+    [Parameter] public int Size { get; set; } = 32;
+
+    string Initials => string.Concat(Name.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Where(w => char.IsLetter(w[0])).Take(2).Select(w => char.ToUpperInvariant(w[0])));
+}

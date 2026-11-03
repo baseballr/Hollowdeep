@@ -1,0 +1,66 @@
+<div class="craft">
+    <div class="craft-head">
+        <Icon Src="@OutputIcon" Name="@Title" Size="24" />
+        <span class="craft-title">@Title</span>
+        @if (Makes > 1)
+        {
+            <span class="pill">makes @Makes</span>
+        }
+    </div>
+    <div class="craft-body">
+        <div class="craft-grid">
+            @for (var r = 0; r < 3; r++)
+            {
+                @for (var c = 0; c < 3; c++)
+                {
+                    var cell = Cell(r, c);
+                    <div class="slot">
+                        @if (cell is not null && cell.Name != "")
+                        {
+                            <Icon Src="@cell.Icon" Name="@cell.Name" Size="32" />
+                        }
+                    </div>
+                }
+            }
+        </div>
+        <div class="craft-arrow">
+            <svg viewBox="0 0 24 24" width="28" height="28"><path fill="currentColor" d="M4 11h12.2l-4.6-4.6L13 5l7 7-7 7-1.4-1.4 4.6-4.6H4z" /></svg>
+        </div>
+        <div class="slot slot-out">
+            <Icon Src="@OutputIcon" Name="@Title" Size="36" />
+            @if (Makes > 1)
+            {
+                <span class="slot-count">@Makes</span>
+            }
+        </div>
+    </div>
+    <ul class="craft-legend">
+        @foreach (var (name, count) in Legend)
+        {
+            <li><b>@count×</b> @name</li>
+        }
+    </ul>
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string? OutputIcon { get; set; }
+    [Parameter] public int Makes { get; set; } = 1;
+    [Parameter] public List<List<Data.Cell>> Rows { get; set; } = new();
+
+    // Recipes narrower or shorter than 3x3 sit in the middle of the grid, like the crafting table shows them.
+    Data.Cell? Cell(int r, int c)
+    {
+        var h = Rows.Count;
+        var w = Rows.Count == 0 ? 0 : Rows.Max(x => x.Count);
+        int top = h < 3 ? (3 - h) / 2 : 0, left = w < 3 ? (3 - w) / 2 : 0;
+        var rr = r - top; var cc = c - left;
+        if (rr < 0 || rr >= h || cc < 0 || cc >= Rows[rr].Count) return null;
+        return Rows[rr][cc];
+    }
+
+    IEnumerable<(string, int)> Legend => Rows.SelectMany(r => r)
+        .Where(c => c.Name != "")
+        .GroupBy(c => c.Name)
+        .Select(g => (g.Key, g.Count()));
+}

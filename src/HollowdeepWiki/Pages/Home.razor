@@ -1,0 +1,69 @@
+@page "/"
+@inject WikiService Data
+
+<PageTitle>Hollowdeep Wiki</PageTitle>
+
+<nav class="crumbs"><span class="here">Home</span></nav>
+
+<section class="hero">
+    <h1>Hollowdeep Wiki</h1>
+    <p class="lead">
+        Everything in the Hollowdeep add-on for Minecraft Bedrock: rift dungeons in five tiers, the mobs and elites that
+        fill them, four themed bosses, and the relics you bring home. Every number here is read straight from the add-on,
+        so it always matches the latest release.
+    </p>
+    <div class="stats">
+        <div><b>@Data.Wiki.Stats.Topics</b><span>Topics</span></div>
+        <div><b>@Data.Wiki.Stats.Mobs</b><span>Mobs</span></div>
+        <div><b>@Data.Wiki.Stats.Items</b><span>Items</span></div>
+        <div><b>5</b><span>Rift tiers</span></div>
+    </div>
+    <div class="lineup"><img src="img/lineup.png" alt="The four Hollowdeep bosses" /></div>
+</section>
+
+<DownloadPanel />
+
+<h2 class="section-title">Browse the wiki</h2>
+<div class="card-grid">
+    @foreach (var c in Data.Wiki.Categories)
+    {
+        <a class="card" href="@($"wiki/{c.Slug}")">
+            <div class="card-top">
+                <Icon Src="@c.Icon" Name="@c.Title" Size="36" />
+                <span class="pill">@c.Entries.Count @(c.Entries.Count == 1 ? "entry" : "entries")</span>
+            </div>
+            <div class="card-title">@c.Title</div>
+            <div class="card-text">@c.Blurb</div>
+            <div class="card-arrow">→</div>
+        </a>
+    }
+    <a class="card" href="recipes">
+        <div class="card-top">
+            <Icon Src="@Data.Wiki.Recipes.FirstOrDefault()?.Icon" Name="Recipes" Size="36" />
+            <span class="pill">@Data.Wiki.Recipes.Count recipes</span>
+        </div>
+        <div class="card-title">All recipes</div>
+        <div class="card-text">Every crafting table recipe in one list.</div>
+        <div class="card-arrow">→</div>
+    </a>
+</div>
+
+<h2 class="section-title">Start here</h2>
+<ol class="steps">
+    <li>
+        <b>Get into a rift</b>
+        <span>Craft a <a href="@Link("Rift Keys")">Rift Key</a> or find a <a href="@Link("Rift Gates")">Rift Gate</a> in the world. Bring friends: everyone close by comes with you. <a href="@Link("How to play")">How to play</a> walks through a first run.</span>
+    </li>
+    <li>
+        <b>Clear the chambers</b>
+        <span>Fight through the waves, watch for <a href="@Link("Elites")">elites</a> and <a href="@Link("Mimic")">Mimics</a>, then beat the <a href="@Link("Boss fights")">boss</a> before the timer runs out.</span>
+    </li>
+    <li>
+        <b>Loot and climb</b>
+        <span>Take the vault's <a href="@Link("Relics")">relics</a>, then spend <a href="@Link("Hollow Essence")">Hollow Essence</a> and <a href="@Link("Rift Core")">Rift Cores</a> on keys for higher <a href="@Link("Rift tiers")">tiers</a>.</span>
+    </li>
+</ol>
+
+@code {
+    string Link(string name) => Data.AllEntries.FirstOrDefault(e => e.Name == name)?.Href ?? "wiki";
+}

@@ -1,0 +1,100 @@
+@page "/wiki/{CatSlug}/{Slug}"
+@inject WikiService Data
+
+@if (entry is null || cat is null)
+{
+    <PageTitle>Not found · Hollowdeep Wiki</PageTitle>
+    <Breadcrumbs Category="cat" />
+    <h1>Not found</h1>
+    <p>That page doesn't exist. Try the search box on the left.</p>
+}
+else
+{
+    <PageTitle>@entry.Name · Hollowdeep Wiki</PageTitle>
+    <Breadcrumbs Category="cat" Entry="entry" />
+    <article class="entry">
+        <header class="entry-head">
+            <Icon Src="@entry.Icon" Name="@entry.Name" Size="64" />
+            <div>
+                <h1>@entry.Name</h1>
+                <a class="pill" href="@($"wiki/{cat.Slug}")">@cat.Title</a>
+            </div>
+        </header>
+        @foreach (var b in entry.Blocks)
+        {
+            @switch (b.T)
+            {
+                case "h2":
+                    <h2>@b.Text</h2>
+                    break;
+                case "h3":
+                    <h3>@b.Text</h3>
+                    break;
+                case "p":
+                    <p>@((MarkupString)(b.Html ?? ""))</p>
+                    break;
+                case "table":
+                case "html":
+                    @((MarkupString)(b.Html ?? ""))
+                    break;
+                case "figure":
+                    <figure class="mob-figure">
+                        <img src="@b.Icon" alt="@b.Text" loading="lazy" />
+                        <figcaption>@b.Text</figcaption>
+                    </figure>
+                    break;
+                case "icons":
+                    <div class="tier-row">
+                        @foreach (var c in b.Rows?.FirstOrDefault() ?? new())
+                        {
+                            <div class="tier-tile">
+                                <Icon Src="@c.Icon" Name="@c.Name" Size="48" />
+                                <span>@c.Name</span>
+                            </div>
+                        }
+                    </div>
+                    break;
+                case "grid":
+                    @if (!string.IsNullOrEmpty(b.Note) && b.Note != "Crafting table")
+                    {
+                        <p class="muted small">@b.Note:</p>
+                    }
+                    <CraftGrid Title="@(b.Title ?? entry.Name)" OutputIcon="@OutputIcon(b)" Makes="b.Makes" Rows="@(b.Rows ?? new())" />
+                    break;
+            }
+        }
+    </article>
+    <nav class="pager">
+        @if (prev is not null)
+        {
+            <a class="pager-link" href="@prev.Href"><small>Previous</small>« @prev.Name</a>
+        }
+        else
+        {
+            <span></span>
+        }
+        @if (next is not null)
+        {
+            <a class="pager-link next" href="@next.Href"><small>Next</small>@next.Name »</a>
+        }
+    </nav>
+}
+
+@code {
+    [Parameter] public string CatSlug { get; set; } = "";
+    [Parameter] public string Slug { get; set; } = "";
+    Category? cat;
+    Entry? entry, prev, next;
+
+    protected override void OnParametersSet()
+    {
+        cat = Data.FindCategory(CatSlug);
+        entry = cat?.Entries.FirstOrDefault(e => e.Slug == Slug);
+        var all = Data.AllEntries.ToList();
+        var i = entry is null ? -1 : all.IndexOf(entry);
+        prev = i > 0 ? all[i - 1] : null;
+        next = i >= 0 && i < all.Count - 1 ? all[i + 1] : null;
+    }
+
+    string? OutputIcon(Block b) => b.Icon ?? entry!.Icon;
+}

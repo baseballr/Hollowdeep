@@ -1,0 +1,7 @@
+{
+  "version": "3.0.9",
+  "file": "Hollowdeep_v3.0.9.mcaddon",
+  "minecraftMin": "1.21.50",
+  "minecraftMax": "26.60",
+  "notes": "Fixes 3.0.8, whose scripts didn't load (scripts/version.js was empty), so rifts, gates, bosses and relics did nothing. Also in 3.0.8: new skins, models and item icons for every mob, boss and item. Also in 3.0.7: bosses rebalanced per tier (damage, adds, enrage timer) and leashed to their arena."
+}
