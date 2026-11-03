@@ -1,0 +1,36 @@
+@page "/wiki/{Slug}"
+@inject WikiService Data
+
+@if (cat is null)
+{
+    <PageTitle>Not found · Hollowdeep Wiki</PageTitle>
+    <Breadcrumbs />
+    <h1>Not found</h1>
+    <p>There's no wiki section called “@Slug”. <a href="wiki">See all sections</a>.</p>
+}
+else
+{
+    <PageTitle>@cat.Title · Hollowdeep Wiki</PageTitle>
+    <Breadcrumbs Category="cat" />
+    <h1>@cat.Title</h1>
+    <p class="lead">@cat.Blurb</p>
+    <div class="entry-list">
+        @foreach (var e in cat.Entries)
+        {
+            <a class="entry-row" href="@e.Href">
+                <Icon Src="@e.Icon" Name="@e.Name" Size="40" />
+                <div>
+                    <div class="entry-name">@e.Name</div>
+                    <div class="entry-sum">@e.Summary</div>
+                </div>
+                <span class="card-arrow">→</span>
+            </a>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public string Slug { get; set; } = "";
+    Category? cat;
+    protected override void OnParametersSet() => cat = Data.FindCategory(Slug);
+}

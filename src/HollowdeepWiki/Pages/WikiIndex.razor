@@ -1,0 +1,27 @@
+@page "/wiki"
+@inject WikiService Data
+
+<PageTitle>Wiki · Hollowdeep</PageTitle>
+<Breadcrumbs />
+
+<h1>Wiki</h1>
+<p class="lead">@Data.Wiki.Stats.Topics topics, grouped the way you'll meet them in game. Every number is read from the add-on itself.</p>
+
+@foreach (var g in Data.Groups)
+{
+    <h2 class="section-title">@g.Key</h2>
+    <div class="card-grid">
+        @foreach (var c in g)
+        {
+            <a class="card" href="@($"wiki/{c.Slug}")">
+                <div class="card-top">
+                    <Icon Src="@c.Icon" Name="@c.Title" Size="36" />
+                    <span class="pill">@c.Entries.Count @(c.Entries.Count == 1 ? "entry" : "entries")</span>
+                </div>
+                <div class="card-title">@c.Title</div>
+                <div class="card-text">@c.Blurb</div>
+                <div class="card-arrow">→</div>
+            </a>
+        }
+    </div>
+}

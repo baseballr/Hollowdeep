@@ -1,0 +1,33 @@
+@page "/download"
+@inject WikiService Data
+
+<PageTitle>Download · Hollowdeep Wiki</PageTitle>
+<nav class="crumbs"><a href="">Home</a><span>›</span><span class="here">Download</span></nav>
+<h1>Download</h1>
+<p class="lead">This page always points at the newest release of Hollowdeep.</p>
+
+<DownloadPanel />
+
+<h2>Works on</h2>
+<table class="info-table">
+    <tr><th>Minecraft</th><td>Bedrock Edition <b>@Data.Release.Range</b></td></tr>
+    <tr><th>Add-on version</th><td>@Data.Release.Version</td></tr>
+    <tr><th>File</th><td>@Data.Release.File (@Data.Release.Size)</td></tr>
+    <tr><th>Older versions</th><td><a href="@Data.Release.AllReleases">All releases on GitHub</a></td></tr>
+</table>
+<p class="muted small">
+    The lowest version is set by the scripting API the add-on uses, the highest is the newest Minecraft it was tested on.
+    Newer Minecraft versions usually work too, but haven't been checked yet.
+</p>
+
+<h2>Install</h2>
+<ol class="plain-steps">
+    <li>Download the <b>.mcaddon</b> file above and open it. Minecraft imports both the behavior pack and the resource pack.</li>
+    <li>Edit your world, open <b>Behavior Packs</b>, and activate <b>Hollowdeep BP</b>. The resource pack is added with it.</li>
+    <li>No experiments or Beta APIs are needed: Hollowdeep only uses stable scripting APIs.</li>
+    <li>On a server, every player and the server need the same version.</li>
+</ol>
+
+<h2>Updating a world</h2>
+<p>Updates keep the same pack IDs and item IDs, so you can drop the new version onto an existing world or server. Each release has a new version number, so Minecraft always imports it over the old one.</p>
+<p>Rifts open when you update are cleaned up when the world loads, and anyone inside is sent home.</p>

@@ -1,0 +1,39 @@
+@page "/recipes"
+@inject WikiService Data
+
+<PageTitle>Recipes · Hollowdeep Wiki</PageTitle>
+<nav class="crumbs"><a href="">Home</a><span>›</span><span class="here">Recipes</span></nav>
+<h1>All recipes</h1>
+<p class="lead">Every crafting table recipe in Hollowdeep: the Rift Keys and the Rift Ledger. Everything else comes from rifts.</p>
+
+<div class="filter">
+    <input type="search" placeholder="Filter by result or ingredient, e.g. steel plate" @bind="filter" @bind:event="oninput" aria-label="Filter recipes" />
+    <span class="muted small">@Shown.Count() of @Data.Wiki.Recipes.Count</span>
+</div>
+
+<div class="recipe-grid">
+    @foreach (var r in Shown)
+    {
+        <div class="recipe-card">
+            <CraftGrid Title="@r.Name" OutputIcon="@r.Icon" Makes="r.Makes" Rows="r.Rows" />
+            <a class="small" href="@r.Href">@r.Entry →</a>
+        </div>
+    }
+</div>
+
+@code {
+    string filter = "";
+
+    IEnumerable<Recipe> Shown
+    {
+        get
+        {
+            var words = filter.ToLowerInvariant().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            return Data.Wiki.Recipes.Where(r =>
+            {
+                var text = $"{r.Name} {r.Entry} {string.Join(' ', r.Rows.SelectMany(x => x).Select(c => c.Name))}".ToLowerInvariant();
+                return words.All(text.Contains);
+            });
+        }
+    }
+}

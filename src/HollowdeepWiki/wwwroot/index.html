@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hollowdeep Wiki</title>
+    <meta name="description" content="Wiki for the Hollowdeep add-on for Minecraft Bedrock: rift dungeons, mobs, elites, bosses, relics and the balance table, with the latest .mcaddon download." />
+    <base href="/" />
+    <link rel="icon" type="image/png" href="img/pack_icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/app.css" />
+    <script>
+        window.hdTheme = {
+            get: function () { return document.documentElement.getAttribute('data-theme'); },
+            set: function (t) {
+                document.documentElement.setAttribute('data-theme', t);
+                try { localStorage.setItem('hd-theme', t); } catch (e) { }
+            }
+        };
+        (function () {
+            var t = null;
+            try { t = localStorage.getItem('hd-theme'); } catch (e) { }
+            if (!t) t = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+</head>
+
+<body>
+    <div id="app">
+        <div class="loading"><div class="spinner"></div>Loading the wiki…</div>
+    </div>
+
+    <div id="blazor-error-ui">
+        Something went wrong.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">✕</a>
+    </div>
+    <script src="_framework/blazor.webassembly.js"></script>
+</body>
+
+</html>

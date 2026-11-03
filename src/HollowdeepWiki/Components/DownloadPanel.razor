@@ -1,0 +1,30 @@
+@inject WikiService Data
+@{ var r = Data.Release; }
+<div class="download-panel">
+    <div class="dl-main">
+        <div class="dl-label">Latest release</div>
+        <div class="dl-version">Hollowdeep v@(r.Version)</div>
+        <div class="dl-range">
+            <span class="mc-badge">Minecraft Bedrock @r.Range</span>
+            @if (!string.IsNullOrEmpty(r.Date))
+            {
+                <span class="muted small">Released @r.Date</span>
+            }
+        </div>
+        @if (!string.IsNullOrEmpty(r.Notes) && ShowNotes)
+        {
+            <p class="dl-notes">@r.Notes</p>
+        }
+    </div>
+    <div class="dl-actions">
+        <a class="btn btn-primary btn-lg" href="@r.Download">
+            <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M11 3h2v10l3.5-3.5 1.4 1.4L12 16.8l-5.9-5.9 1.4-1.4L11 13zM4 19h16v2H4z" /></svg>
+            Download .mcaddon
+        </a>
+        <span class="muted small">@r.File · @r.Size</span>
+    </div>
+</div>
+
+@code {
+    [Parameter] public bool ShowNotes { get; set; } = true;
+}

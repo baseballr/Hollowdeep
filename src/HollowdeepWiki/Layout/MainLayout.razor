@@ -1,0 +1,181 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject WikiService Data
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+<div class="topbar">
+    <div class="topbar-inner">
+        <button class="icon-btn menu-btn" aria-label="Open menu" @onclick="() => menuOpen = !menuOpen">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z" /></svg>
+        </button>
+        <a class="brand" href="">
+            <img src="img/pack_icon.png" alt="" width="32" height="32" />
+            <span>Hollowdeep <b>Wiki</b></span>
+        </a>
+        <nav class="topnav">
+            <NavLink href="" Match="NavLinkMatch.All">Home</NavLink>
+            <NavLink href="wiki">Wiki</NavLink>
+            <NavLink href="recipes">Recipes</NavLink>
+            <NavLink href="download">Download</NavLink>
+        </nav>
+        <div class="topbar-right">
+            <button class="icon-btn" aria-label="Toggle dark mode" title="Toggle dark mode" @onclick="ToggleTheme">
+                @if (dark)
+                {
+                    <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0-5h0v3h0zm0 17v3M4.2 4.2l2.1 2.1m11.4 11.4 2.1 2.1M2 12h3m14 0h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="2" /></svg>
+                }
+                else
+                {
+                    <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M20 15.3A8.5 8.5 0 0 1 8.7 4 8.5 8.5 0 1 0 20 15.3z" /></svg>
+                }
+            </button>
+            @if (Data.Ready)
+            {
+                <a class="btn btn-primary btn-sm" href="@Data.Release.Download">
+                    <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M11 3h2v10l3.5-3.5 1.4 1.4L12 16.8l-5.9-5.9 1.4-1.4L11 13zM4 19h16v2H4z" /></svg>
+                    v@(Data.Release.Version)
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+@if (!Data.Ready)
+{
+    <div class="loading"><div class="spinner"></div>Loading the wiki…</div>
+}
+else
+{
+    <div class="shell">
+        <aside class="sidebar @(menuOpen ? "open" : "")">
+            <div class="browse">
+                <div class="browse-title">Browse</div>
+                <div class="search">
+                    <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M10 2a8 8 0 0 1 6.3 12.9l5.4 5.4-1.4 1.4-5.4-5.4A8 8 0 1 1 10 2zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12z" /></svg>
+                    <input type="search" placeholder="Search the wiki" @bind="query" @bind:event="oninput" @onkeydown="SearchKey" aria-label="Search the wiki" />
+                </div>
+                @if (!string.IsNullOrWhiteSpace(query))
+                {
+                    var hits = Data.Search(query, 12);
+                    <div class="search-results">
+                        @if (hits.Count == 0)
+                        {
+                            <div class="muted small pad">Nothing matches “@query”.</div>
+                        }
+                        @foreach (var e in hits)
+                        {
+                            <a href="@e.Href" @onclick="Close">
+                                <Icon Src="@e.Icon" Name="@e.Name" Size="20" />
+                                <span>@e.Name<small>@e.Category.Title</small></span>
+                            </a>
+                        }
+                    </div>
+                }
+            </div>
+            <nav class="side-nav">
+                <div class="side-group">
+                    <div class="side-group-title">Overview</div>
+                    <NavLink href="" Match="NavLinkMatch.All" @onclick="Close">Home</NavLink>
+                    <NavLink href="download" @onclick="Close">Download</NavLink>
+                    <NavLink href="recipes" @onclick="Close">All recipes</NavLink>
+                </div>
+                @foreach (var g in Data.Groups)
+                {
+                    <div class="side-group">
+                        <div class="side-group-title">@g.Key</div>
+                        @foreach (var c in g)
+                        {
+                            var active = Nav.ToBaseRelativePath(Nav.Uri).StartsWith($"wiki/{c.Slug}");
+                            <NavLink href="@($"wiki/{c.Slug}")" Match="NavLinkMatch.Prefix" @onclick="Close">
+                                @c.Title <span class="count">@c.Entries.Count</span>
+                            </NavLink>
+                            @if (active)
+                            {
+                                <div class="side-sub">
+                                    @foreach (var e in c.Entries)
+                                    {
+                                        <NavLink href="@e.Href" @onclick="Close">@e.Name</NavLink>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                }
+            </nav>
+            <div class="side-version">
+                <div>Add-on <b>v@(Data.Release.Version)</b></div>
+                <div>Bedrock <b>@Data.Release.Range</b></div>
+            </div>
+        </aside>
+        @if (menuOpen)
+        {
+            <div class="scrim" @onclick="Close"></div>
+        }
+        <main class="content">
+            @Body
+        </main>
+    </div>
+    <footer class="footer">
+        <div class="footer-inner">
+            <div>
+                <div class="brand small"><img src="img/pack_icon.png" alt="" width="24" height="24" /> Hollowdeep</div>
+                <p class="muted small">Rift dungeons, bosses and relics for Minecraft Bedrock. Every number on this wiki is read from the v@(Data.Release.Version) add-on, so it always matches the latest release.</p>
+            </div>
+            <div class="footer-links">
+                <a href="wiki">Wiki</a>
+                <a href="recipes">Recipes</a>
+                <a href="download">Download</a>
+                <a href="@Data.Release.AllReleases">All releases</a>
+            </div>
+        </div>
+        <div class="footer-note muted small">Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.</div>
+    </footer>
+}
+
+@code {
+    bool menuOpen;
+    bool dark = true;
+    string query = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        Nav.LocationChanged += OnLocationChanged;
+        await Data.EnsureLoadedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            dark = await JS.InvokeAsync<string>("hdTheme.get") == "dark";
+            StateHasChanged();
+        }
+    }
+
+    async Task ToggleTheme()
+    {
+        dark = !dark;
+        await JS.InvokeVoidAsync("hdTheme.set", dark ? "dark" : "light");
+    }
+
+    void Close() => menuOpen = false;
+
+    void SearchKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(query))
+        {
+            var first = Data.Search(query, 1).FirstOrDefault();
+            if (first is not null) { Nav.NavigateTo(first.Href); query = ""; menuOpen = false; }
+        }
+        else if (e.Key == "Escape") query = "";
+    }
+
+    void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        query = "";
+        StateHasChanged();
+    }
+
+    public void Dispose() => Nav.LocationChanged -= OnLocationChanged;
+}
