@@ -189,7 +189,8 @@ def build(d):
                 f"Once a minute, each player on the surface of the Overworld (between y {G['height'][0]} and {G['height'][1]}) has a "
                 f"<b>{pct(G['chance'])}</b> chance to make a gate appear.",
                 f"The gate lands {G['range'][0]} to {G['range'][1]} blocks away, and chat tells you how far and in which direction.",
-                "Gates only appear on flat, natural ground (grass, dirt, sand, stone, snow and so on) with open sky, so they never land on your builds.",
+                "Gates only appear on natural ground (grass, dirt, sand, stone, snow and so on) with open sky, so they never land on your builds. "
+                "The ground can be a little uneven: the gate levels a block of bumps or dips.",
                 f"There are at most <b>{G['max']}</b> gates in the world at once.",
                 f"A gate fades after <b>{G['lifetimeMin']} minutes</b> of real time, and the ground under it is put back.",
             ]),
@@ -850,7 +851,7 @@ def build(d):
                    ["<code>/scriptevent hollowdeep:forge</code>", "Opens the [[Hollow Forge]] without the item."],
                    ["<code>/scriptevent hollowdeep:relic 3</code>", "Gives you a random relic rolled at tier 1 to 5."],
                    ["<code>/scriptevent hollowdeep:xp 500</code>", "Gives you Delver XP (see [[Delver ranks]])."]]),
-            P("There's no command to spawn a [[Rift Gates|Rift Gate]]; use <code>hollowdeep:open</code> to test rifts."),
+            P("<code>/scriptevent hollowdeep:gate</code> opens a [[Rift Gates|Rift Gate]] 28 to 52 blocks from you, if there's clear natural ground."),
             H2("For other add-ons"),
             P("Other add-ons can add their items to vault chests. Registrations are saved in the world."),
             TABLE([["Command", "What it does"],

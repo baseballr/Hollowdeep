@@ -1,13 +1,13 @@
 {
-  "version": "3.1.0",
-  "file": "Hollowdeep_v3.1.0.mcaddon",
+  "version": "3.1.1",
+  "file": "Hollowdeep_v3.1.1.mcaddon",
   "minecraftMin": "1.21.50",
   "minecraftMax": "26.60",
-  "notes": "Depth update. Chambers now roll objectives (Hold the Sigil, Hunt the Champion, Rune Lock) and can hide optional Reliquaries and Shrines with risky pacts. Bosses raise wards you break by shattering Ward Anchors, and each arena has its own hazard. Tier V bosses are Ascended, with a Last Stand phase and a chance at one of four new unique relics. New Hollow Forge to ascend, temper, reroll and salvage relics, and ten Delver ranks with permanent perks. Fix: bosses no longer start a fight already in phase 2.",
-  "tag": "v3.1.0",
-  "download": "https://github.com/baseballr/Hollowdeep/releases/download/v3.1.0/Hollowdeep_v3.1.0.mcaddon",
-  "releasePage": "https://github.com/baseballr/Hollowdeep/releases/tag/v3.1.0",
+  "notes": "Depth update. Chambers now roll objectives (Hold the Sigil, Hunt the Champion, Rune Lock) and can hide optional Reliquaries and Shrines with risky pacts. Bosses raise wards you break by shattering Ward Anchors, and each arena has its own hazard. Tier V bosses are Ascended, with a Last Stand phase and a chance at one of four new unique relics. New Hollow Forge to ascend, temper, reroll and salvage relics, and ten Delver ranks with permanent perks. Fixes: Rift Gates now actually appear (they needed perfectly flat ground, so outside plains they almost never spawned; now they try 12 spots per attempt and accept ground one block up or down), and /scriptevent hollowdeep:gate opens one near you. Bosses no longer start a fight already in phase 2.",
+  "tag": "v3.1.1",
+  "download": "https://github.com/baseballr/Hollowdeep/releases/download/v3.1.1/Hollowdeep_v3.1.1.mcaddon",
+  "releasePage": "https://github.com/baseballr/Hollowdeep/releases/tag/v3.1.1",
   "allReleases": "https://github.com/baseballr/Hollowdeep/releases",
-  "sizeBytes": 161605,
-  "date": "2026-11-03"
+  "sizeBytes": 162090,
+  "date": "2026-11-04"
 }
