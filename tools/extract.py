@@ -291,7 +291,8 @@ def main():
     for pools in tables.values():
         vanilla_ids |= {e["item"] for p in pools for e in p["entries"] if e["item"].startswith("minecraft:")}
     vanilla_ids |= {"minecraft:lodestone", "minecraft:crying_obsidian", "minecraft:chest", "minecraft:command_block",
-                    "minecraft:book", "minecraft:clock", "minecraft:totem_of_undying", "minecraft:obsidian"}
+                    "minecraft:book", "minecraft:clock", "minecraft:totem_of_undying", "minecraft:obsidian",
+                    "minecraft:sea_lantern"}
     vicons = vanilla_icons(sorted(vanilla_ids), args.vanilla_src, WWW / "img" / "vanilla")
     missing = sorted(vanilla_ids - set(vicons))
     if missing:

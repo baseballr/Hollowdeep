@@ -1,7 +1,7 @@
 {
-  "version": "3.0.9",
-  "file": "Hollowdeep_v3.0.9.mcaddon",
+  "version": "3.1.0",
+  "file": "Hollowdeep_v3.1.0.mcaddon",
   "minecraftMin": "1.21.50",
   "minecraftMax": "26.60",
-  "notes": "Fixes 3.0.8, whose scripts didn't load (scripts/version.js was empty), so rifts, gates, bosses and relics did nothing. Also in 3.0.8: new skins, models and item icons for every mob, boss and item. Also in 3.0.7: bosses rebalanced per tier (damage, adds, enrage timer) and leashed to their arena."
+  "notes": "Depth update. Chambers now roll objectives (Hold the Sigil, Hunt the Champion, Rune Lock) and can hide optional Reliquaries and Shrines with risky pacts. Bosses raise wards you break by shattering Ward Anchors, and each arena has its own hazard. Tier V bosses are Ascended, with a Last Stand phase and a chance at one of four new unique relics. New Hollow Forge to ascend, temper, reroll and salvage relics, and ten Delver ranks with permanent perks. Fix: bosses no longer start a fight already in phase 2."
 }

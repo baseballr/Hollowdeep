@@ -53,6 +53,16 @@ for (const part of abilityText.split(/\n  (?=\w+\(rift, boss)/).slice(1)) {
 const cooldowns = {};
 for (const m of src("relics.js").matchAll(/ready\(p, "(\w+)", ([\d *]+)\)/g)) cooldowns[m[1]] = Function(`return (${m[2]})`)() / 20;
 
+// Forge costs: COSTS in forge.js is a table of small functions; evaluate them for every rarity / temper.
+const costs = Function("isUnique", `"use strict"; return (${literal("forge.js", "COSTS")});`)(() => false);
+const forge = {
+  ascend: [0, 1, 2].map((r) => costs.ascend({ rarity: r, temper: 0 })),
+  temper: [0, 1, 2, 3].map((r) => [0, 1, 2, 3, 4].map((t) => costs.temper({ rarity: r, temper: t }))),
+  reroll: [0, 1, 2, 3].map((r) => costs.reroll({ rarity: r, temper: 0 })),
+  salvage: [0, 1, 2, 3].map((r) => costs.salvage({ rarity: r, temper: 0 }, "")),
+  salvagePerStar: costs.salvage({ rarity: 0, temper: 1 }, "").ess - costs.salvage({ rarity: 0, temper: 0 }, "").ess,
+};
+
 const out = {
   version: (/VERSION = "([\d.]+)"/.exec(src("version.js")) ?? [])[1] ?? null,
   tiers: cfg.TIERS,
@@ -74,6 +84,14 @@ const out = {
   abilities,
   cooldowns,
   curses: value("mobs.js", "CURSES"),
+  ranks: value("ledger.js", "RANKS"),
+  forge,
+  objectives: value("chambers.js", "OBJECTIVES"),
+  pacts: value("chambers.js", "PACTS"),
+  uniqueRelics: value("rolls.js", "UNIQUE_RELICS"),
+  holdBase: num("chambers.js", /c\.need = 20 \* \((\d+) \+ (\d+) \* rift\.tier\)/),
+  uniqueChance: num("rift.js", /ascended && unique && Math\.random\(\) < ([\d.]+)/)[0],
+  ascendedTier: num("bosses.js", /ascended: rift\.tier >= (\d+)/)[0],
   gates: {
     max: num("gates.js", /MAX_GATES = (\d+)/)[0],
     chance: num("gates.js", /SPAWN_CHANCE = ([\d.]+)/)[0],
