@@ -157,8 +157,9 @@ def build(d):
                 "Craft a <b>Rift Key</b> (recipe below), or find a [[Rift Gates|Rift Gate]] that tears open near you.",
                 f"Gather your friends: everyone standing within <b>{L['joinRadius']} blocks</b> of you when you use the key comes along.",
                 "Use the key. The rift builds in a few seconds, then everyone is pulled inside.",
-                "Walk into the first chamber. The gate shuts behind you and the waves start. Clear every wave to open the next gate.",
-                "After the last chamber comes the boss arena. Beat the boss and the vault gate opens.",
+                "Walk into the first chamber. The gate shuts behind you and the fight starts. Each chamber has a [[Chamber objectives|goal]]: "
+                "clear the waves, hold a sigil, hunt a champion or crack a rune lock. Finish it to open the next gate.",
+                "After the last chamber comes the boss arena. Break the boss's [[Boss fights|wards]], dodge its arena hazards and beat it, and the vault gate opens.",
                 f"Loot the vault chests. You have <b>{secs(L['lootWindow'])}</b> before the rift collapses and sends you home.",
             ]),
             key1,
@@ -176,6 +177,8 @@ def build(d):
               "[[Rift Keys|Rift Key II to V]]: higher tiers have more chambers, tougher mobs, more vault chests and better "
               "[[Relics|relic]] odds. Relics are the gear Hollowdeep is built around: carry them for their bonuses and use "
               "them for their powers."),
+            P("Everything you earn feeds back in: spend Essence and Cores at the [[Hollow Forge]] to ascend, temper and reroll your "
+              "relics, and earn Delver XP from every kill and clear to climb the ten [[Delver ranks]] and unlock permanent perks."),
         ], aliases=["Getting started"]))
 
     start.append(ENTRY("Rift Gates", icon("minecraft:lodestone"),
@@ -186,7 +189,8 @@ def build(d):
                 f"Once a minute, each player on the surface of the Overworld (between y {G['height'][0]} and {G['height'][1]}) has a "
                 f"<b>{pct(G['chance'])}</b> chance to make a gate appear.",
                 f"The gate lands {G['range'][0]} to {G['range'][1]} blocks away, and chat tells you how far and in which direction.",
-                "Gates only appear on flat, natural ground (grass, dirt, sand, stone, snow and so on) with open sky, so they never land on your builds.",
+                "Gates only appear on natural ground (grass, dirt, sand, stone, snow and so on) with open sky, so they never land on your builds. "
+                "The ground can be a little uneven: the gate levels a block of bumps or dips.",
                 f"There are at most <b>{G['max']}</b> gates in the world at once.",
                 f"A gate fades after <b>{G['lifetimeMin']} minutes</b> of real time, and the ground under it is put back.",
             ]),
@@ -235,13 +239,14 @@ def build(d):
             H2("The rooms"),
             TABLE([["Room", "Size", "What happens there"],
                    ["Entrance", "15 long, 15 wide", "Where you arrive. The exit sigil is here."],
-                   ["Chambers", "25 long, 21 wide", "Waves of mobs. A gate seals the way on until the chamber is clear. Loot caches line the walls."],
+                   ["Chambers", "25 long, 21 wide", "Each has an [[Chamber objectives|objective]]. A gate seals the way on until it's done. Loot caches line the walls, and some chambers have a barred Reliquary."],
                    ["Boss arena", "35 long, 33 wide", "The theme's boss rises when you walk in. It can't leave the arena."],
                    ["Vault", "13 long, 11 wide", "Opens when the boss dies: the relic chest and the vault chests, plus a second exit sigil."]]),
             P("Short corridors join the rooms, each with a gate. The number of chambers depends on the [[Rift tiers|tier]]."),
             H2("Chambers and waves"),
-            P("A chamber wakes up when you step into it. Each chamber has several waves; the next wave comes when the last mob "
-              "of the one before it is dead. When the last wave is cleared the next gate opens."),
+            P("A chamber wakes up when you step into it. The first chamber is always a Purge: several waves, the next coming when the "
+              "last mob of the one before it is dead. Later chambers can roll other goals, see [[Chamber objectives]]. "
+              "When you enter a rift, chat lists each chamber's objective."),
             P("The number of mobs in a wave is:"),
             P("<code>base + chamber number + 2 × wave number + (players − 1) × per extra player</code>, "
               "capped at the tier's maximum. Hollow Wisps come in threes but only count as two."),
@@ -252,7 +257,7 @@ def build(d):
               "[[Warded Husk|Warded Husks]] and [[Bone Chorus|Bone Choruses]], and from the second chamber on the "
               "[[Rift themes|theme]]'s own mobs join in."),
             H2("The HUD"),
-            P("The action bar shows the tier, which chamber you're in, how many foes are left, the time remaining and the rift's modifiers."),
+            P("The action bar shows the tier, which chamber you're in, its objective's progress, how many foes are left, the time remaining and the rift's modifiers."),
             H2("Limits"),
             LIST([f"Up to <b>{L['maxRifts']}</b> rifts can be open at once in a world. Opening another tells you to wait.",
                   "Each open rift uses one ticking area. Bedrock allows 10 per world, so if yours are all taken the rift can't form "
@@ -261,6 +266,38 @@ def build(d):
                   f"Rifts are built at x {L['origin']['x']:,}, y {L['origin']['y']}, far from anything you've built. "
                   "Vanilla monsters that wander in are removed."]),
         ], aliases=["Rift layout", "Chambers"]))
+
+    obj = js["objectives"]
+    ow = sum(o["weight"] for o in obj.values())
+    hb = js["holdBase"]
+    rift.append(ENTRY("Chamber objectives", icon("minecraft:sea_lantern"),
+        "Every chamber after the first rolls a goal: clear the waves, hold a sigil, hunt a champion or crack a rune lock. "
+        "Some also hide a barred Reliquary, and a rift can hold a Shrine that offers a bargain.",
+        [
+            H2("Objectives"),
+            TABLE([["Objective", "Chance", "How to clear it"],
+                   [obj["waves"]["name"], pct(obj["waves"]["weight"] / ow), "Kill every wave. The first chamber is always a Purge."],
+                   [obj["hold"]["name"], pct(obj["hold"]["weight"] / ow),
+                    f"A ring of sea lanterns glows in the middle of the floor. Stand in it until it charges: {hb[0]} + {hb[1]} × tier seconds "
+                    "with one player, faster with more. Foes keep coming, and any foe inside the ring stalls the charge. When it's full the rest are banished."],
+                   [obj["champion"]["name"], pct(obj["champion"]["weight"] / ow),
+                    "A Champion waits on a gilded dais at the far end: an elite with extra health, Resistance and fire immunity that calls guards "
+                    "every 15 seconds. Kill it and its guards scatter. Champions drop extra Essence and often a Rift Core."],
+                   [obj["runes"]["name"], pct(obj["runes"]["weight"] / ow),
+                    "Four coloured pedestals with buttons on top. Beat the guardians, then watch the runes light up and press them in the same "
+                    "order. Two rounds; the sequence is 3 + half the tier long and one longer in round two. A wrong press hurts everyone and "
+                    "summons more guardians, then the runes show a new sequence."]]),
+            P("The same objective never comes twice in a row, except Purge."),
+            H2("Reliquaries"),
+            P("About one chamber in three (at most two per rift) has a barred alcove in its north wall with a relic inside. Once the "
+              "chamber is clear, press the button on the gold block beside the bars to wake its guardians: a pack of elites, each with an "
+              "[[Elites|affix]]. Kill them all and the bars lift, revealing a chest with a rolled relic (+10% quality) and some Essence. "
+              "It's optional: skip it if your party is hurting."),
+            H2("Shrines"),
+            P("About half of all rifts hide a Shrine in one chamber. It rises from the floor when that chamber is cleared. Press its button "
+              "to hear its bargain, and accept or walk away. A pact binds the whole party and can only be taken once."),
+            TABLE([["Pact", "Price", "Reward"]] + [[v["name"], v["cost"], v["gain"]] for v in js["pacts"].values()]),
+        ], aliases=["Objectives", "Hold the Sigil", "Hunt the Champion", "Rune Lock", "Reliquary", "Shrine", "Shrines", "Pacts", "Champion"]))
 
     # ---- tiers
     rows = [["", *[f"Tier {ROMAN[t - 1]}" for t in tiers]]]
@@ -546,7 +583,23 @@ def build(d):
                 "<b>Phase 2</b> (below 2/3): it announces itself in chat, calls in a group of adds and unlocks more abilities. "
                 "From now on it also calls more adds every so often (only while fewer than 12 are alive).",
                 "<b>Phase 3</b> (below 1/3): another wave of adds, every ability, all cooldowns 30% shorter, Speed II, and from Tier III up Strength I.",
+                f"<b>Last Stand</b> (Tier {ROMAN[js['ascendedTier'] - 1]} only, below 15%): the Ascended boss gets Speed III, raises one more ward and uses its abilities even faster.",
             ]),
+            H2("Wards"),
+            P("When a boss enters phase 2 (and phase 3, from Tier III up) it raises a ward: it becomes immune to damage and slowly heals, "
+              "while 3 or 4 Ward Anchors float around the arena, linked to it by blue flames. Shatter every anchor to break the ward. "
+              "The boss is then <b>staggered</b> for 8 seconds: nearly frozen, weakened, and unable to use abilities or call adds. Hit it hard."),
+            H2("Arena hazards"),
+            P("Each arena fights back with its theme's hazard, more often in later phases:"),
+            TABLE([["Arena", "Hazard", "What to do"],
+                   ["Sunken Crypt", "Graves split open under each player and one random spot, then burst with Wither.", "Step out of the soul circle."],
+                   ["Ember Forge", "Floor vents glow, then erupt in columns of fire, one of them under a player.", "Move off the flaming rings."],
+                   ["Frostbound Vault", "A blizzard sweeps the arena: everyone not within 4 blocks of one of the four campfire braziers is frozen and slowed.", "Run to a brazier when the blizzard warning shows."],
+                   ["Verdant Ruin", "Spore pods burst where players stand and linger for 5 seconds, poisoning anyone inside.", "Leave the cloud and fight elsewhere."]]),
+            H2("Ascended bosses"),
+            P(f"Every Tier {ROMAN[js['ascendedTier'] - 1]} boss is <b>Ascended</b>: its name is shown in red, it has the Last Stand phase, and "
+              f"beating it gives 100 extra Delver XP. It has a {pct(js['uniqueChance'])} chance to drop its own unique relic, always Epic or "
+              "Legendary: " + ", ".join(f"[[{N.label[b]}]]: [[{name(r)}]]" for b, r in js["uniqueRelics"].items()) + "."),
             H2("Enrage"),
             P("If the fight lasts too long the boss enrages: chat says <i>ENRAGED!</i> and it gets Speed III and Strength."),
             H2("Boss tuning by tier"),
@@ -565,8 +618,8 @@ def build(d):
             P("The boss can't leave its arena: if it follows you into the corridor it is pulled back to the middle in a puff of smoke. "
               "It rises when you first walk into the arena, so take a breath in the corridor first."),
             H2("Rewards"),
-            P("See [[Loot]]: Rift Cores, Hollow Essence, the boss's own relic, and the vault."),
-        ], aliases=["Bosses", "Boss", "Enrage"]))
+            P("See [[Loot]]: Rift Cores, Hollow Essence, the boss's own relic, and the vault. Ascended bosses can also drop a unique relic."),
+        ], aliases=["Bosses", "Boss", "Enrage", "Wards", "Ward Anchors", "Ascended", "Arena hazards", "Last Stand"]))
 
     for k in BOSSES:
         spec = js["bosses"][k]
@@ -637,17 +690,21 @@ def build(d):
             LIST([
                 "Relics work from anywhere in your inventory; they don't need to be in your hand.",
                 "If you carry two of the same relic, only the one with the higher total bonuses counts.",
-                "Only your best <b>four</b> relics (by total bonuses) count at once.",
+                "Only your best <b>four</b> relics (by total bonuses) count at once: five from [[Delver ranks|Delver rank]] 3 and six from rank 7.",
                 "Power only adds damage against Hollowdeep mobs; Leech works on anything you hit.",
                 "Fortune uses the best Fortune in the party, not everyone's added together.",
             ]),
             H2("Getting relics"),
             P("Every vault has a relic chest with one random relic. The [[Forge Tyrant]], [[Winter Matriarch]] and [[Briar Colossus]] "
               "also drop their own theme's relic. Relics taken from the creative inventory or with <code>/give</code> keep their "
-              "power but have no rarity and no bonuses: only relics from rifts are rolled."),
+              "power but have no rarity and no bonuses: only relics from rifts are rolled. [[Chamber objectives|Reliquaries]] hold one "
+              "more, and Ascended (Tier V) bosses can drop a unique relic."),
+            H2("Improving relics"),
+            P("Take relics to the [[Hollow Forge]] to ascend their rarity, temper them (up to five stars, +10% each) or reroll a bonus. "
+              "Relics you don't want can be salvaged for Essence."),
             H2("All relics"),
             {"t": "icons", "rows": [[{"name": v, "icon": icon(k)} for k, v in rel.items()]]},
-        ], aliases=["Relic", "Rarity", "Power", "Haste", "Leech", "Vigor", "Fortune"])]
+        ], aliases=["Relic", "Rarity", "Power", "Haste", "Leech", "Vigor", "Fortune", "Unique relics"])]
 
     cd = js["cooldowns"]
     relic_text = {
@@ -668,6 +725,17 @@ def build(d):
                                    "Dropped by the [[Winter Matriarch]].", "frost_charm"),
         "hollowdeep:briar_totem": ("Use it to heal every player within 10 blocks (you too) by 3 hearts and give Regeneration II for "
                                    "5 seconds. Dropped by the [[Briar Colossus]].", "briar_totem"),
+        "hollowdeep:regent_crown": ("Use it to rend the souls of every monster within 8 blocks: each takes 6 magic damage and you heal "
+                                    "1 heart per soul (up to 5 hearts). Unique: dropped only by the Ascended [[Tomb Regent]].", "regent_crown"),
+        "hollowdeep:tyrant_hammer": ("Use it to slam the ground: every monster within 6 blocks takes 10 damage, burns for 3 seconds and "
+                                     "is thrown into the air (bosses aren't). Uses 1 durability. Unique: dropped only by the Ascended [[Forge Tyrant]].",
+                                     "tyrant_hammer"),
+        "hollowdeep:winter_heart": ("Use it to encase every monster within 8 blocks in ice: 4 damage, Slowness VII and Weakness II for 4 "
+                                    "seconds (bosses get Slowness II for 2.5 seconds). Passive: anything that hits you is slowed. "
+                                    "Unique: dropped only by the Ascended [[Winter Matriarch]].", "winter_heart"),
+        "hollowdeep:colossus_seed": ("Use it to plant a grove where you stand for 8 seconds: every second, players within 6 blocks heal "
+                                     "1 heart and monsters inside are slowed and take 1.5 damage. Unique: dropped only by the Ascended "
+                                     "[[Briar Colossus]].", "colossus_seed"),
     }
     for k, v in rel.items():
         text, cdk = relic_text[k]
@@ -708,13 +776,15 @@ def build(d):
          P("Most mobs have a 55% chance to drop one, elites drop 2 to 4, Mimics 3 to 6 and bosses 10 + 4 × tier. Caches and vault "
            "chests hold more (see [[Loot]]). The [[Relics|Fortune]] bonus gives a chance of one extra per kill."),
          H2("Uses"),
-         LIST(["[[Rift Keys|Rift Key II]] (4) and [[Rift Keys|Rift Key III]] (4)", "[[Rift Ledger]] (2)"])]))
+         LIST(["[[Rift Keys|Rift Key II]] (4) and [[Rift Keys|Rift Key III]] (4)", "[[Rift Ledger]] (2)", "[[Hollow Forge]] (4)",
+               "Every [[Hollow Forge]] upgrade"])]))
     its.append(ENTRY("Rift Core", icon("hollowdeep:rift_core"),
         "The heart of a beaten boss. Rift Cores are what you need to upgrade keys past Tier II.",
         [H2("Getting it"),
          P("Every boss drops 1 + tier Rift Cores, and the vault relic chest often has more (see [[Loot]])."),
          H2("Uses"),
-         LIST(["[[Rift Keys|Rift Key III]] (2)", "[[Rift Keys|Rift Key IV]] (3)", "[[Rift Keys|Rift Key V]] (4)"])]))
+         LIST(["[[Rift Keys|Rift Key III]] (2)", "[[Rift Keys|Rift Key IV]] (3)", "[[Rift Keys|Rift Key V]] (4)", "[[Hollow Forge]] (1)",
+               "Ascending relics, and tempering past three stars, at the [[Hollow Forge]]"])]))
     its.append(ENTRY("Soul Tether", icon(tether),
         "You get one when you respawn after dying in a rift. Use it to return to the rift's entrance.",
         [P("It only works while the rift you died in is still open and you are still one of its members. If the rift has ended it "
@@ -726,12 +796,45 @@ def build(d):
         "A book that keeps your rift record. Use it to see your stats and the server's top delvers.",
         [led,
          H2("Your stats"),
-         P("Rifts opened, rifts cleared, kills, deaths, and your fastest clear time at each tier."),
+         P("Your [[Delver ranks|Delver rank]], XP and perks, then rifts opened, rifts cleared, kills, deaths, and your fastest clear time at each tier."),
          H2("Top Delvers"),
          P("The five players with the most clears (kills break ties), and the fastest clear at each tier. Offline players are included."),
          P("Clears are also kept on the <code>hd_clears</code> scoreboard. <code>/scriptevent hollowdeep:board</code> shows it on the sidebar.")]))
+    fg = js["forge"]
+    rar_n = [r["n"] for r in js["rarities"]]
+    cost = lambda c: f"{c['ess']} Essence" + (f" + {c['core']} Core{'s' if c['core'] > 1 else ''}" if c["core"] else "")
+    its.append(ENTRY("Hollow Forge", icon("hollowdeep:hollow_forge"),
+        "A portable forge. Use it to spend Essence and Rift Cores improving your relics, or to break unwanted relics down.",
+        [grid("hollowdeep:hollow_forge"),
+         H2("Using it"),
+         P("Use the forge (right-click / tap) anywhere. It lists every rolled relic in your inventory; pick one to see what you can do with it. "
+           "Greyed-out options show what you're missing."),
+         TABLE([["Action", "What it does"],
+                ["Ascend", "Raises the rarity one step. Every bonus scales up to the new rarity and the relic gains a new bonus."],
+                ["Temper", "Adds a star (up to five). Each star raises every bonus by 10% (at least +1). Vigor grows on the 3rd and 5th star."],
+                ["Reroll", "Pick one bonus: it's replaced by a bonus the relic doesn't have, rolled at its rarity and stars."],
+                ["Salvage", "Destroys the relic for Essence (and Cores for Epic and Legendary)."]]),
+         H2("Costs"),
+         TABLE([["Rarity", "Ascend", "Reroll", "Salvage gives"]] + [
+                [rar_n[r], cost(fg["ascend"][r]) if r < 3 else "max", cost(fg["reroll"][r]), cost(fg["salvage"][r])] for r in range(4)]),
+         TABLE([["Temper to", *[f"{'★' * (t + 1)}" for t in range(5)]]] + [
+                [rar_n[r], *[cost(fg["temper"][r][t]) for t in range(5)]] for r in range(4)]),
+         P(f"Salvage gives {fg['salvagePerStar']} more Essence per star, and unique relics give 3 more Cores. "
+           "[[Delver ranks|Delver rank]] 2 takes 10% off every Essence cost, and rank 6 takes 20%.")],
+        aliases=["Forge", "Ascend", "Temper", "Reroll", "Salvage"]))
+    rk = js["ranks"]
+    its.append(ENTRY("Delver ranks", icon("hollowdeep:rift_ledger"),
+        "Every kill and clear earns Delver XP. Ten ranks, each with a permanent perk.",
+        [H2("Earning XP"),
+         TABLE([["Deed", "XP"], ["Kill a mob", 1], ["Kill an elite", 5], ["Kill a Mimic", 8], ["Kill a Champion", 15],
+                ["Clear a rift (everyone alive at the end)", "60 × tier"], ["Beat an Ascended boss", "100 more"]]),
+         H2("Ranks"),
+         TABLE([["Rank", "Name", "XP", "Perk"]] + [[i + 1, r["name"], f"{r['xp']:,}", r["perk"] or "-"] for i, r in enumerate(rk)]),
+         P("Perks add up: a rank keeps every perk below it (the forge discount and relic slots take the best one). "
+           "Your rank, XP and perks are in the [[Rift Ledger]]. Ranking up shows a title and plays a sound.")],
+        aliases=["Delver rank", "Ranks", "Delver XP", "XP"]))
     cats.append({"title": "Items", "group": "Loot and gear",
-                 "blurb": "Keys, the materials you collect, the Soul Tether and the Rift Ledger.", "entries": its})
+                 "blurb": "Keys, materials, the Hollow Forge, Delver ranks, the Soul Tether and the Rift Ledger.", "entries": its})
 
     # ============================================================ Commands
     cmds = [ENTRY("Commands", icon("minecraft:command_block"),
@@ -744,8 +847,11 @@ def build(d):
                    ["<code>/scriptevent hollowdeep:end</code>", "Closes every open rift and sends everyone home."],
                    ["<code>/scriptevent hollowdeep:stats</code>", "Shows your [[Rift Ledger]] stats."],
                    ["<code>/scriptevent hollowdeep:top</code>", "Shows the Top Delvers."],
-                   ["<code>/scriptevent hollowdeep:board</code>", "Shows Rift Clears on the sidebar."]]),
-            P("There's no command to spawn a [[Rift Gates|Rift Gate]]; use <code>hollowdeep:open</code> to test rifts."),
+                   ["<code>/scriptevent hollowdeep:board</code>", "Shows Rift Clears on the sidebar."],
+                   ["<code>/scriptevent hollowdeep:forge</code>", "Opens the [[Hollow Forge]] without the item."],
+                   ["<code>/scriptevent hollowdeep:relic 3</code>", "Gives you a random relic rolled at tier 1 to 5."],
+                   ["<code>/scriptevent hollowdeep:xp 500</code>", "Gives you Delver XP (see [[Delver ranks]])."]]),
+            P("<code>/scriptevent hollowdeep:gate</code> opens a [[Rift Gates|Rift Gate]] 28 to 52 blocks from you, if there's clear natural ground."),
             H2("For other add-ons"),
             P("Other add-ons can add their items to vault chests. Registrations are saved in the world."),
             TABLE([["Command", "What it does"],
