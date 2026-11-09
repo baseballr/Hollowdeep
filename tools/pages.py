@@ -486,9 +486,10 @@ def build(d):
                   [f"Has only {n(N.ent['ward_crystal']['hp'])} health and never gets tier bonuses, but it floats above the husk's head and moves with it.",
                    "It doesn't attack, drops nothing, and doesn't count toward clearing the chamber."]),
         mob_entry("hexcaster", "A robed caster that hangs back and fires curse bolts.",
-                  [f"Every 2.75 seconds, if a player is within 15 blocks, it fires a curse bolt (a purple line of particles) that always hits. "
+                  [f"Every 2.75 seconds, if it can see a player within 15 blocks, it fires a curse bolt (a purple line of particles) that always hits. "
+                   "Solid blocks stop it: it won't fire through walls, floors or closed doors, so it has to come around to get a shot. "
                    f"The bolt deals magic damage that goes up with the tier ({hex_dmg}) and puts one random curse on you: {curses}.",
-                   "It is fragile up close. Close the distance or break its line of sight."]),
+                   "It is fragile up close. Close the distance, or duck behind a wall to break its line of sight."]),
         mob_entry("bone_chorus", "A skeletal singer that raises the dead. Kill it first.",
                   ["While a Bone Chorus is alive, any other mob that dies within 14 blocks of it rises again 3 seconds later "
                    "(a soul flame marks the spot). A raised mob can't come back a second time, can't be an elite and drops nothing.",
