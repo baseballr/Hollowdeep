@@ -191,6 +191,9 @@ def build(d):
                 f"The gate lands {G['range'][0]} to {G['range'][1]} blocks away, and chat tells you how far and in which direction.",
                 "Gates only appear on natural ground (grass, dirt, sand, stone, snow and so on) with open sky, so they never land on your builds. "
                 "The ground can be a little uneven: the gate levels a block of bumps or dips.",
+                f"Gates keep their distance: none within {G['home']} blocks of world spawn or your bed, and never two within "
+                f"{G['spacing']} blocks of each other. You get no new gate while one is already within {G['nearby']} blocks of you, "
+                f"or for {G['cooldownMin']} minutes after one opened near you.",
                 f"There are at most <b>{G['max']}</b> gates in the world at once.",
                 f"A gate fades after <b>{G['lifetimeMin']} minutes</b> of real time, and the ground under it is put back.",
             ]),
@@ -852,7 +855,10 @@ def build(d):
                    ["<code>/scriptevent hollowdeep:forge</code>", "Opens the [[Hollow Forge]] without the item."],
                    ["<code>/scriptevent hollowdeep:relic 3</code>", "Gives you a random relic rolled at tier 1 to 5."],
                    ["<code>/scriptevent hollowdeep:xp 500</code>", "Gives you Delver XP (see [[Delver ranks]])."]]),
-            P("<code>/scriptevent hollowdeep:gate</code> opens a [[Rift Gates|Rift Gate]] 28 to 52 blocks from you, if there's clear natural ground."),
+            P("<code>/scriptevent hollowdeep:gate</code> opens a [[Rift Gates|Rift Gate]] 28 to 52 blocks from you, if there's clear natural ground "
+              "away from spawn, your bed and other gates."),
+            P("<code>/scriptevent hollowdeep:cleargates</code> removes every Rift Gate and puts the ground back. Gates near you go at once, "
+              "including any the add-on lost track of within 128 blocks; far ones go the next time their area is loaded."),
             H2("For other add-ons"),
             P("Other add-ons can add their items to vault chests. Registrations are saved in the world."),
             TABLE([["Command", "What it does"],
