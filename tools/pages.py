@@ -191,6 +191,9 @@ def build(d):
                 f"The gate lands {G['range'][0]} to {G['range'][1]} blocks away, and chat tells you how far and in which direction.",
                 "Gates only appear on natural ground (grass, dirt, sand, stone, snow and so on) with open sky, so they never land on your builds. "
                 "The ground can be a little uneven: the gate levels a block of bumps or dips.",
+                f"Gates keep their distance: none within {G['home']} blocks of world spawn or your bed, and never two within "
+                f"{G['spacing']} blocks of each other. You get no new gate while one is already within {G['nearby']} blocks of you, "
+                f"or for {G['cooldownMin']} minutes after one opened near you.",
                 f"There are at most <b>{G['max']}</b> gates in the world at once.",
                 f"A gate fades after <b>{G['lifetimeMin']} minutes</b> of real time, and the ground under it is put back.",
             ]),
@@ -279,7 +282,9 @@ def build(d):
                    [obj["waves"]["name"], pct(obj["waves"]["weight"] / ow), "Kill every wave. The first chamber is always a Purge."],
                    [obj["hold"]["name"], pct(obj["hold"]["weight"] / ow),
                     f"A ring of sea lanterns glows in the middle of the floor. Stand in it until it charges: {hb[0]} + {hb[1]} × tier seconds "
-                    "with one player, faster with more. Foes keep coming, and any foe inside the ring stalls the charge. When it's full the rest are banished."],
+                    "with one player, faster with more. You get 8 seconds before the first foes arrive, and they appear away from the ring. "
+                    "Reinforcements come every 8 seconds while the chamber isn't full. A foe inside the ring slows the charge to about a third. "
+                    "When it's full the rest are banished."],
                    [obj["champion"]["name"], pct(obj["champion"]["weight"] / ow),
                     "A Champion waits on a gilded dais at the far end: an elite with extra health, Resistance and fire immunity that calls guards "
                     "every 15 seconds. Kill it and its guards scatter. Champions drop extra Essence and often a Rift Core."],
@@ -489,6 +494,8 @@ def build(d):
                   [f"Every 2.75 seconds, if it can see a player within 15 blocks, it fires a curse bolt (a purple line of particles) that always hits. "
                    "Solid blocks stop it: it won't fire through walls, floors or closed doors, so it has to come around to get a shot. "
                    f"The bolt deals magic damage that goes up with the tier ({hex_dmg}) and puts one random curse on you: {curses}.",
+                   "A raised shield blocks the bolt if you're facing the Hexcaster: no damage and no curse, and the shield loses a little durability. "
+                   "Only a few can be alive in one chamber at once: 1 in Tier I, 2 in Tiers II and III, 3 in Tiers IV and V.",
                    "It is fragile up close. Close the distance, or duck behind a wall to break its line of sight."]),
         mob_entry("bone_chorus", "A skeletal singer that raises the dead. Kill it first.",
                   ["While a Bone Chorus is alive, any other mob that dies within 14 blocks of it rises again 3 seconds later "
@@ -852,7 +859,10 @@ def build(d):
                    ["<code>/scriptevent hollowdeep:forge</code>", "Opens the [[Hollow Forge]] without the item."],
                    ["<code>/scriptevent hollowdeep:relic 3</code>", "Gives you a random relic rolled at tier 1 to 5."],
                    ["<code>/scriptevent hollowdeep:xp 500</code>", "Gives you Delver XP (see [[Delver ranks]])."]]),
-            P("<code>/scriptevent hollowdeep:gate</code> opens a [[Rift Gates|Rift Gate]] 28 to 52 blocks from you, if there's clear natural ground."),
+            P("<code>/scriptevent hollowdeep:gate</code> opens a [[Rift Gates|Rift Gate]] 28 to 52 blocks from you, if there's clear natural ground "
+              "away from spawn, your bed and other gates."),
+            P("<code>/scriptevent hollowdeep:cleargates</code> removes every Rift Gate and puts the ground back. Gates near you go at once, "
+              "including any the add-on lost track of within 128 blocks; far ones go the next time their area is loaded."),
             H2("For other add-ons"),
             P("Other add-ons can add their items to vault chests. Registrations are saved in the world."),
             TABLE([["Command", "What it does"],

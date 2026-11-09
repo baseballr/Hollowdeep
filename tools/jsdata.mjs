@@ -99,6 +99,10 @@ const out = {
     distances: num("gates.js", /d < (\d+) \? 1 : d < (\d+) \? 2 : d < (\d+) \? 3 : d < (\d+) \? 4 : 5/),
     range: num("gates.js", /r = rand\((\d+), (\d+)\)/),
     height: num("gates.js", /p\.location\.y < (\d+) \|\| p\.location\.y > (\d+)/),
+    nearby: num("gates.js", /NEARBY_RADIUS = (\d+)/)[0],
+    spacing: num("gates.js", /GATE_SPACING = (\d+)/)[0],
+    home: num("gates.js", /HOME_RADIUS = (\d+)/)[0],
+    cooldownMin: num("gates.js", /PLAYER_COOLDOWN_MS = (\d+) \* 60 \* 1000/)[0],
   },
 };
 process.stdout.write(JSON.stringify(out));
